@@ -150,7 +150,7 @@ class HybridEnergyOptimizer:
             Dictionary with simulation results
         """
         if self.time_series is None:
-            raise ValueError("Please generate or load data first")
+            raise ValueError("Please load data first")
         
         # Initialize arrays for simulation
         n_intervals = len(self.time_series)
@@ -189,7 +189,7 @@ class HybridEnergyOptimizer:
                         current_soc += energy_charged
                         bess_power[i] = -bess_charge  # Negative for charging
 
-                    rankine_power[i] = rankine_output
+                    rankine_power[i] = rankine_output * self.hours_per_interval
                     
                 
                 # Record any unmet demand
@@ -285,8 +285,9 @@ class HybridEnergyOptimizer:
         # Run simulation
         try:
             results = self.simulate_bess_operation(capacity)
-        except:
-            return 100  # Large penalty for simulation failures
+        except Exception as e:
+            print(f"Simulation failed at capacity {capacity}: {e}")
+            return 100
         
         # Calculate penalty components
         reliability_penalty = 10
@@ -299,13 +300,13 @@ class HybridEnergyOptimizer:
         lol_penalty = results['lol_penalty'] *1000  # Scale factor
         
         # Economic costs
-        capital_cost = results['bess_capital_cost'] * 0.1
-        fuel_cost = results['fuel_cost'] * 10
+        capital_cost = results['bess_capital_cost'] *0.1
+        fuel_cost = results['fuel_cost'] * 100
         
         # Total objective (to minimize)
         total_cost = reliability_penalty + lol_penalty + capital_cost + fuel_cost
         
-        return total_cost
+        return total_cost / 1e4 #scale cost to minimize gradient
     
     def optimize_bess_capacity(self, initial_guess=40.0, max_capacity=100.0):
         """
@@ -337,9 +338,9 @@ class HybridEnergyOptimizer:
         result = minimize(
             fun=self.objective_function,
             x0=[initial_guess],
-            method='L-BFGS-B',  # Good for bounded problems
+            method='Powell',
             bounds=bounds,
-            options={'disp': True, 'maxiter': 50}
+            options={ 'disp': True, 'maxiter': 200 }
         )
         
         # Extract optimal capacity
@@ -512,7 +513,8 @@ class HybridEnergyOptimizer:
         # 3. Power flows
         axes[1,0].plot(time_subset['datetime'], results['bess_power'], 
                       label='BESS Power', color='blue', linewidth=2)
-        axes[1,0].plot(time_subset['datetime'], results['rankine_power'], 
+        axes[1,0].plot(time_subset['datetime'], results['rankine_power'],alpha=0.5,
+                        
                       label='Rankine Power', color='orange', linewidth=2)
         axes[1,0].plot(time_subset['datetime'], results['load_not_served'], 
                       label='Load Not Served', color='red', linewidth=2)
@@ -552,3 +554,46 @@ class HybridEnergyOptimizer:
             axes[1,1].text(bar.get_x() + bar.get_width()/2., height + 0.1,
                           f'{value:.1f}%', ha='center', va='bottom', fontsize=8)
         plt.show()
+
+    def progressive_optimization(self):
+        tolerance_levels = [
+            {'gtol': 1e-1, 'ftol': 1e-1, 'eps': 1e-3},  # Very relaxed
+            {'gtol': 1e-2, 'ftol': 1e-2, 'eps': 1e-4},  # Relaxed  
+            {'gtol': 1e-3, 'ftol': 1e-3, 'eps': 1e-5},  # Moderate
+            {'gtol': 1e-5, 'ftol': 1e-9, 'eps': 1e-8},  # Default (strict)
+        ]
+        
+        for i, opts in enumerate(tolerance_levels):
+            print(f"\nTrying tolerance level {i+1}: {opts}")
+            
+            result = minimize(
+                self.objective_function,
+                x0=[50.0],  # Start away from problem point
+                method='L-BFGS-B',
+                options=opts
+            )
+            
+            print(f"Success: {result.success}, Status: {result.status}, Iterations: {result.nit}")
+            
+            if result.success:
+                print(f"Found solution with relaxed tolerances: {result.x[0]:.3f}")
+                
+        
+        return None
+    
+    def compare_methods(self):
+        methods = [
+            ('L-BFGS-B', {}),
+            ('L-BFGS-B', {'eps': 1e-3, 'gtol': 1e-2}),  # Modified L-BFGS-B
+            ('SLSQP', {}),        # Different gradient-based method
+            ('Powell', {}),       # Gradient-free
+            ('Nelder-Mead', {}),  # Gradient-free, robust
+        ]
+        
+        for method, opts in methods:
+            try:
+                result = minimize(self.objective_function, x0=[50.0], 
+                                method=method, options=opts)
+                print(f"{method}: success={result.success}, fun={result.fun:.2e}, x={result.x[0]:.2f}")
+            except Exception as e:
+                print(f"{method}: failed with {e}")
