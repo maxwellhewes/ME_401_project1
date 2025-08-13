@@ -68,11 +68,27 @@ class HybridEnergyOptimizer:
                       label='Wind Generation', color='blue', linewidth=2)
         axes[0,0].plot(subset_data['datetime'], subset_data['demand'], 
                       label='Demand', color='red', linewidth=2)
-        axes[0,0].set_title('Generation and Demand (First 30 Days)')
+        axes[0,0].set_title('Generation and Demand')
         axes[0,0].set_ylabel('Power (MW)')
         axes[0,0].legend()
         axes[0,0].grid(True, alpha=0.3)
         
+        #save figure for report
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(subset_data['datetime'], subset_data['pv_generation'],
+                label='PV Generation', color='orange', linewidth=2)
+        plt.plot(subset_data['datetime'], subset_data['wind_generation'],
+                label='Wind Generation', color='blue', linewidth=2)
+        plt.plot(subset_data['datetime'], subset_data['demand'],
+                label='Demand', color='red', linewidth=2)
+        plt.title('Generation and Demand')
+        plt.ylabel('Power (MW)')
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        plt.savefig('gen_demand1.png', dpi=300, bbox_inches='tight')
+        plt.close()
+                
         # 2. Load Duration Curve
         sorted_demand = np.sort(self.time_series['demand'])[::-1]
         sorted_renewable = np.sort(self.time_series['total_renewable'])[::-1]
@@ -85,6 +101,19 @@ class HybridEnergyOptimizer:
         axes[0,1].set_ylabel('Power (MW)')
         axes[0,1].legend()
         axes[0,1].grid(True, alpha=0.3)
+
+        #save figure for report
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(percentiles, sorted_demand, label='Demand', color='red', linewidth=2)
+        plt.plot(percentiles, sorted_renewable, label='Total Renewable', color='green', linewidth=2)
+        plt.title('Load Duration Curve')
+        plt.xlabel('Percentage of Time (%)')
+        plt.ylabel('Power (MW)')
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        plt.savefig('LDC.png', dpi=300, bbox_inches='tight')
+        plt.close()
         
         # 3. Net Load Analysis
         axes[1,0].hist(self.time_series['net_load'], bins=50, alpha=0.7, color='purple', edgecolor='black')
@@ -94,6 +123,19 @@ class HybridEnergyOptimizer:
         axes[1,0].set_ylabel('Frequency')
         axes[1,0].legend()
         axes[1,0].grid(True, alpha=0.3)
+
+        #save figure for report
+
+        plt.figure(figsize=(10, 6))
+        plt.hist(self.time_series['net_load'], bins=50, alpha=0.7, color='purple', edgecolor='black')
+        plt.axvline(0, color='red', linestyle='--', linewidth=2, label='Zero Net Load')
+        plt.title('Net Load Distribution\n(Demand - Renewable Generation)')
+        plt.xlabel('Net Load (MW)')
+        plt.ylabel('Frequency')
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        plt.savefig('NLD.png', dpi=300, bbox_inches='tight')
+        plt.close()
         
         # 4. Monthly Energy Balance
         monthly_data = self.time_series.copy()
@@ -124,6 +166,22 @@ class HybridEnergyOptimizer:
         
         plt.tight_layout()
         plt.show()
+
+        #save figure for report
+
+        plt.figure(figsize=(10, 6))
+        plt.bar(x - width/2, monthly_summary['total_renewable'], width, 
+                     label='Renewable Generation', color='green', alpha=0.7)
+        plt.bar(x + width/2, monthly_summary['demand'], width, 
+                     label='Demand', color='red', alpha=0.7)
+        plt.xticks(x,months)
+        plt.title('Monthly Energy Balance')
+        plt.xlabel('Month')
+        plt.ylabel('Energy (MWh)')
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        plt.savefig('energy_balance.png', dpi=300, bbox_inches='tight')
+        plt.close()      
         
         # Print key statistics
         print("\n" + "="*60)
@@ -189,7 +247,7 @@ class HybridEnergyOptimizer:
                         current_soc += energy_charged
                         bess_power[i] = -bess_charge  # Negative for charging
 
-                    rankine_power[i] = rankine_output * self.hours_per_interval
+                    rankine_power[i] = rankine_output
                     
                 
                 # Record any unmet demand
@@ -340,7 +398,9 @@ class HybridEnergyOptimizer:
             x0=[initial_guess],
             method='Powell',
             bounds=bounds,
-            options={ 'disp': True, 'maxiter': 200 }
+            options={ 'disp': False
+            
+            , 'maxiter': 200 }
         )
         
         # Extract optimal capacity
@@ -477,7 +537,7 @@ class HybridEnergyOptimizer:
         fig.suptitle(f'BESS Optimization Results - {results["bess_capacity_mwh"]:.1f} MWh Capacity', 
                     fontsize=16, fontweight='bold')
         
-        # Create time array for plotting (first 60 intervals = 30 days)
+        # Create time array for plotting with optional series subset of 120 days
         time_subset = self.time_series#.head(120)
         
         # 1. Energy balance and BESS operation
@@ -488,13 +548,33 @@ class HybridEnergyOptimizer:
         axes[0,0].plot(time_subset['datetime'], 
                       results['bess_power'] ,
                       label='Net Supply (with BESS)', color='blue', linewidth=2, linestyle='--')
-        axes[0,0].set_title('Energy Balance (First 60 Days)')
+        axes[0,0].set_title('Energy Balance')
         axes[0,0].set_ylabel('Power (MW)')
         axes[0,0].legend()
         axes[0,0].grid(True, alpha=0.3)
         axes[0,0].xaxis.set_major_locator(DayLocator(interval=30))  # or HourLocator(interval=6) for hours
         axes[0,0].xaxis.set_major_formatter(DateFormatter("%m-%d"))
         axes[0,0].tick_params(axis='x', rotation=45)
+
+        #save figure for report
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(time_subset['datetime'], time_subset['demand'], 
+                      label='Demand', color='red', linewidth=2)
+        plt.plot(time_subset['datetime'], time_subset['total_renewable'], 
+                      label='Renewable Generation', color='green', linewidth=2)
+        plt.plot(time_subset['datetime'], 
+                      results['bess_power'] ,
+                      label='Net Supply (with BESS)', color='blue', linewidth=2, linestyle='--')
+        plt.title('Energy Balance')
+        plt.ylabel('Power (MW)')
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        plt.gca().xaxis.set_major_locator(DayLocator(interval=30))      
+        plt.gca().xaxis.set_major_formatter(DateFormatter("%m-%d"))
+        plt.tick_params(axis='x', rotation=45)
+        plt.savefig('opt_en_bal.png', dpi=300, bbox_inches='tight')
+        plt.close()      
         
         # 2. BESS State of Charge
         axes[0,1].plot(time_subset['datetime'], results['bess_soc'], 
@@ -509,12 +589,29 @@ class HybridEnergyOptimizer:
         axes[0,1].xaxis.set_major_locator(DayLocator(interval=30))  # or HourLocator(interval=6) for hours
         axes[0,1].xaxis.set_major_formatter(DateFormatter("%m-%d"))
         axes[0,1].tick_params(axis='x', rotation=45)
+
+        #save figure for report
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(time_subset['datetime'], results['bess_soc'], 
+                      color='purple', linewidth=2)
+        plt.axhline(results['bess_capacity_mwh'], color='red', linestyle='--', 
+                         label=f'Max Capacity ({results["bess_capacity_mwh"]:.1f} MWh)')
+        plt.axhline(0, color='black', linestyle='-', alpha=0.5)
+        plt.title('Battery State of Charge')
+        plt.ylabel('Energy (MWh)')
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        plt.gca().xaxis.set_major_locator(DayLocator(interval=30))      
+        plt.gca().xaxis.set_major_formatter(DateFormatter("%m-%d"))
+        plt.tick_params(axis='x', rotation=45)
+        plt.savefig('SOC.png', dpi=300, bbox_inches='tight')
+        plt.close()      
         
         # 3. Power flows
         axes[1,0].plot(time_subset['datetime'], results['bess_power'], 
                       label='BESS Power', color='blue', linewidth=2)
         axes[1,0].plot(time_subset['datetime'], results['rankine_power'],alpha=0.5,
-                        
                       label='Rankine Power', color='orange', linewidth=2)
         axes[1,0].plot(time_subset['datetime'], results['load_not_served'], 
                       label='Load Not Served', color='red', linewidth=2)
@@ -526,6 +623,25 @@ class HybridEnergyOptimizer:
         axes[1,0].xaxis.set_major_locator(DayLocator(interval=30))  # or HourLocator(interval=6) for hours
         axes[1,0].xaxis.set_major_formatter(DateFormatter("%m-%d"))
         axes[1,0].tick_params(axis='x', rotation=45)
+
+        #save figure for report
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(time_subset['datetime'], results['bess_power'], 
+                      label='BESS Power', color='blue', linewidth=2)
+        plt.plot(time_subset['datetime'], results['rankine_power'],alpha=0.5,
+                      label='Rankine Power', color='orange', linewidth=2)
+        plt.plot(time_subset['datetime'], results['load_not_served'], 
+                      label='Load Not Served', color='red', linewidth=2)
+        plt.title('Power Flows (Positive = Discharge/Generation)')
+        plt.ylabel('Power (MW)')
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        plt.gca().xaxis.set_major_locator(DayLocator(interval=30))      
+        plt.gca().xaxis.set_major_formatter(DateFormatter("%m-%d"))
+        plt.tick_params(axis='x', rotation=45)
+        plt.savefig('power_flow.png', dpi=300, bbox_inches='tight')
+        plt.close()
         
         # 4. Reliability metrics
         monthly_reliability = []
@@ -547,6 +663,20 @@ class HybridEnergyOptimizer:
         axes[1,1].set_ylabel('Reliability (%)')
         axes[1,1].legend()
         axes[1,1].grid(True, alpha=0.3)
+
+        #save figure for report
+
+        plt.figure(figsize=(10, 6))
+        plt.bar(months, monthly_reliability, color='skyblue', alpha=0.7, edgecolor='black')
+        plt.axhline(self.reliability_target*100, color='red', linestyle='--', 
+                         linewidth=2, label=f'Target ({self.reliability_target*100:.1f}%)')
+        plt.title('Monthly Reliability Performance')
+        plt.ylabel('Reliability (%)')
+        plt.xticks(months)
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        plt.savefig('reliability.png', dpi=300, bbox_inches='tight')
+        plt.close()
         
         # Add value labels on bars
         for bar, value in zip(bars, monthly_reliability):
