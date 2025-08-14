@@ -225,39 +225,36 @@ class HybridEnergyOptimizer:
             renewable_power = self.time_series.iloc[i]['total_renewable']
             demand = self.time_series.iloc[i]['demand']
             net_load = demand - renewable_power
-            
+            bess_discharge = 0
             # Determine required power from storage and backup
-            if net_load > 0:  # Need additional power
-                # Try to discharge battery first
-                max_discharge_power = min(
-                    self.bess_power_rating,
-                    (current_soc - bess_capacity_mwh*0.2) / self.hours_per_interval,
-                    net_load
-                )
-                bess_discharge = max_discharge_power 
-                remaining_load = net_load - bess_discharge
-                
+            if net_load > 0: 
+                if current_soc > bess_capacity_mwh*0.2:  # Need additional power
+                    # Try to discharge battery first
+                    bess_discharge = min(
+                        self.bess_power_rating,
+                        net_load
+                    ) 
+                    net_load -= bess_discharge
+                    bess_power[i] = bess_discharge
                 # Use Rankine cycle for remaining load
-                if remaining_load > 0:
-                    rankine_output = self.rankine_max_power                                         
-                    remaining_load -= rankine_output 
-                    if remaining_load < 0:
-                        bess_charge = -remaining_load
-                        energy_charged = bess_charge * self.hours_per_interval * self.bess_efficiency
-                        current_soc += energy_charged
+                if net_load > 0:                                                        
+                    net_load -= self.rankine_max_power 
+                    if net_load < 0:
+                        bess_charge = -net_load
+                        energy_charged = bess_charge * self.hours_per_interval 
+                        current_soc += energy_charged * self.bess_efficiency
                         bess_power[i] = -bess_charge  # Negative for charging
 
-                    rankine_power[i] = rankine_output
+                    rankine_power[i] = self.rankine_max_power
                     
                 
                 # Record any unmet demand
-                if remaining_load > 0:
-                    load_not_served[i] = remaining_load
+                if net_load > 0:
+                    load_not_served[i] = net_load
                 
                 # Update battery state
-                energy_discharged = bess_discharge * self.hours_per_interval
-                current_soc -= energy_discharged 
-                bess_power[i] = bess_discharge
+                current_soc -= bess_discharge * self.hours_per_interval 
+                #bess_power[i] = bess_discharge
                 
             else:  # Excess renewable power available
                 # Try to charge battery
@@ -269,7 +266,7 @@ class HybridEnergyOptimizer:
                 )
                 
                 bess_charge = max_charge_power
-                energy_charged = bess_charge * self.hours_per_interval * self.bess_efficiency
+                energy_charged = bess_charge * self.hours_per_interval
                 current_soc += energy_charged
                 bess_power[i] = -bess_charge  # Negative for charging
             
@@ -398,9 +395,8 @@ class HybridEnergyOptimizer:
             x0=[initial_guess],
             method='Powell',
             bounds=bounds,
-            options={ 'disp': False
-            
-            , 'maxiter': 200 }
+            options={ 'disp': False,            
+             'maxiter': 200 }
         )
         
         # Extract optimal capacity
@@ -431,7 +427,7 @@ class HybridEnergyOptimizer:
         
         # 1. Capacity Factor
         total_energy_discharged = np.sum(np.maximum(0, results['bess_power'])) * self.hours_per_interval
-        theoretical_max_energy = self.bess_power_rating * 8760  # Full power for 1 year
+        theoretical_max_energy = self.bess_power_rating * 8760/2  # Full power for 1 year
         capacity_factor = total_energy_discharged / theoretical_max_energy
         
         # 2. Cycling Frequency
@@ -441,7 +437,7 @@ class HybridEnergyOptimizer:
         
         # 3. Energy Throughput Utilization
         total_energy_throughput = np.sum(np.abs(results['bess_power'])) * self.hours_per_interval
-        max_theoretical_throughput = results['bess_capacity_mwh'] * 365 * 2  # 2 cycles per day max
+        max_theoretical_throughput = 48 * 365 * 2  # 4 MW per 12 hour period, 365 days per cycle
         throughput_utilization = total_energy_throughput / max_theoretical_throughput
         
         # 4. Peak Shaving Effectiveness
@@ -492,8 +488,7 @@ class HybridEnergyOptimizer:
         print(f"\nOPTIMAL BESS CONFIGURATION:")
         print(f"  Battery Power Rating: {self.bess_power_rating:.1f} MW (fixed)")
         print(f"  Optimal Energy Capacity: {results['bess_capacity_mwh']:.1f} MWh")
-        print(f"  Optimal Energy-to-Power Ratio: {results['bess_capacity_mwh']/self.bess_power_rating:.1f} hours")
-        
+                
         print(f"\nSYSTEM RELIABILITY PERFORMANCE:")
         print(f"  Achieved Reliability: {results['reliability']*100:.2f}%")
         print(f"  Target Reliability: {self.reliability_target*100:.1f}%")
@@ -507,7 +502,6 @@ class HybridEnergyOptimizer:
         print(f"  Capacity Factor: {perf_metrics['capacity_factor']*100:.1f}%")
         print(f"  Annual Equivalent Cycles: {perf_metrics['annual_cycles']:.0f}")
         print(f"  Throughput Utilization: {perf_metrics['throughput_utilization']*100:.1f}%")
-        print(f"  Peak Shaving Effectiveness: {perf_metrics['peak_shaving_effectiveness']*100:.1f}%")
         print(f"  Actual Round-trip Efficiency: {perf_metrics['actual_round_trip_efficiency']*100:.1f}%")
         print(f"  Energy Discharged (Annual): {perf_metrics['total_energy_discharged']:.0f} MWh")
         print(f"  Energy Charged (Annual): {perf_metrics['total_energy_charged']:.0f} MWh")

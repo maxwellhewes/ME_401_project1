@@ -33,7 +33,7 @@ data.wind = data.wind * optimizer.opt_wind_
 
 system = heo.HybridEnergyOptimizer()
 system.time_series = data.produce_avg_data_frame()
-system.visualize_data_patterns()
+#system.visualize_data_patterns()
 results = system.simulate_bess_operation(10)
 system.optimize_bess_capacity(initial_guess = 100.0)
 print(system.results['optimal_capacity'])
