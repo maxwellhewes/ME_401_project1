@@ -1,4 +1,4 @@
-﻿# ME_401_project 1 - Renewable Energy Infrastructure Optimization Toolkit
+﻿# ME 401 project 1 - Renewable Energy Infrastructure Optimization Toolkit
 
 ## Overview
 
@@ -70,3 +70,4 @@ https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/maxwellhewes
 
 
 This folder can be uploaded to kaggle, or any other notebook hosting service to run the package.
+
