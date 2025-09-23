@@ -1,0 +1,67 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{titlesec}
+\usepackage{parskip}
+\usepackage{lmodern}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue
+}
+
+% Section formatting
+\titleformat{\section}{\normalfont\bfseries\uppercase}{\thesection.}{1em}{}
+\titleformat{\subsection}[runin]{\bfseries}{\thesubsection}{0.5em}{}[.]
+
+% Header
+\begin{document}
+\thispagestyle{plain}
+
+\begin{center}
+    \Large \textbf{ME 401 \\ Systems and Applications} \\
+    \normalsize
+    \textit{Semester:} Fall 2025 \\
+    \textit{LLM:}  \\% ===== ADD MODEL NAME HERE =====
+\end{center}
+
+\vspace{1em}
+
+\section*{Primary Question}
+% What is the topic of interest for this inquiry (heat transfer, coding syntax, fluid mechanics, systems integration)?
+
+
+
+\section*{Initial Thoughts}
+% What is the primary goal of this inference (explanation of a topic, brainstorming, technical assistance, etc.)? What is the intended outcome?
+
+
+
+\section*{Prompt}
+% INPUT USED FOR LLM
+
+
+
+\section*{Results}
+% How many inferences were required to arrive at a satisfactory output? What about this output was helpful? Are there any aspects of the output that seem confusing or might be incorrect?
+
+
+
+\section*{Output}
+\subsection*{Helpful}
+% Copy and paste any outputs that you found especially helpful.
+--\\
+
+
+\subsection*{Unhelpful}
+% If the output produced blatantly false or irrelevant outputs, copy those sections here.
+--\\
+
+
+
+\vspace{2em}
+\noindent\rule{\linewidth}{0.4pt} \\
+\small
+This memo is designed for use by the Wada Research Group to develop ethical and efficient engineering education strategies and technologies. 
+
+\end{document}
