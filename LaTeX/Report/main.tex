@@ -1,0 +1,419 @@
+\documentclass[11pt,letterpaper]{article}
+
+% ============================================================================
+% PACKAGES
+% ============================================================================
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage[style=ieee,backend=biber]{biblatex}
+\usepackage{xcolor}
+\usepackage{subcaption}
+\usepackage[style=ieee]{biblatex}
+\addbibresource{references.bib}
+% ============================================================================
+% FORMATTING
+% ============================================================================
+\addbibresource{references.bib}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue
+}
+
+\captionsetup{
+    labelfont=bf,
+    font=small,
+    width=0.9\textwidth
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{8pt}
+
+% Quick comment style for guidance
+\newcommand{\hint}[1]{\textcolor{teal}{\small\textit{[#1]}}}
+
+% ============================================================================
+% TITLE PAGE
+% ============================================================================
+\title{\textbf{Energy System Analysis \& Design \\ [Your Location]\\
+Port Electrification Analysis}}
+
+\author{
+    Student Name 1, Student Name 2 \\
+    \small ME 401: Engineering Systems and Applications\\
+    \small Department of Mechanical Engineering \\
+    \small Boise State University \\
+    \small \today
+}
+
+\date{}
+
+% ============================================================================
+% DOCUMENT
+% ============================================================================
+\begin{document}
+
+\maketitle
+
+% ============================================================================
+% ABSTRACT
+% ============================================================================
+\begin{abstract}
+\hint{150-200 words: What did you do? What tools? What location? Key result? Why it matters?}
+
+This report presents a renewable energy system design for [Location Name] port operations, integrating solar, wind, and battery storage to meet electrification and heating demands. Using Python optimization tools and COMSOL thermal analysis, we sized generation and storage components to minimize lifecycle costs while achieving [X\%] renewable penetration. The optimal system consists of [summary of results]. This work demonstrates how engineering tools—optimization algorithms, thermal modeling, and data analysis—can be applied to real-world decarbonization challenges in industrial infrastructure.
+
+\hint{Replace the above with your actual abstract once you've completed the analysis.}
+\end{abstract}
+
+% ============================================================================
+% INTRODUCTION
+% ============================================================================
+\section{Introduction}
+
+\hint{What did we accomplish? Why does it matter globally? What skills did we use and why are they valuable?}
+
+Ports worldwide contribute approximately 3\% of global CO$_2$ emissions, with shore power, cargo handling equipment, and facility heating representing major energy consumers. As the shipping industry faces increasing pressure to decarbonize, port electrification powered by renewable energy offers a pathway to reduce both local air pollution and carbon emissions.
+
+\hint{Add 1-2 sentences about YOUR location: Why did you choose it? What makes it interesting?}
+
+This project applies systems engineering principles to design a hybrid renewable energy system for [Your Location]. We used:
+\begin{itemize}
+    \item \textbf{Python} for data analysis, resource assessment, and optimization
+    \item \textbf{Optimization algorithms} to size solar, wind, and battery storage
+    \item \textbf{COMSOL} for thermal system modeling \hint{if applicable}
+    \item \textbf{Systems thinking} to evaluate technical results in real-world context
+\end{itemize}
+
+\textbf{Skills developed:} This project builds competency in multi-domain engineering analysis—combining renewable energy resource assessment, economic optimization, thermal-fluid systems, and critical evaluation of computer-generated solutions. These capabilities are directly applicable to energy consulting, sustainable infrastructure design, and technical decision-making in any industry pursuing decarbonization.
+
+\textbf{Global context:} The methodology developed here extends beyond ports to any facility with reliable power needs and renewable resources: manufacturing plants, data centers, remote communities, or military installations. Understanding how to frame complex problems, apply appropriate tools, and critically evaluate results is fundamental to addressing climate change through engineering.
+
+\hint{Keep intro to 1 page. Get to the point quickly.}
+
+% ============================================================================
+% BACKGROUND
+% ============================================================================
+\section{Background}
+
+\hint{What technologies did you research? How do they connect to thermal-fluid engineering? What's promising? What are the limitations?}
+
+\subsection{Renewable Energy Technologies}
+
+\textbf{Solar Photovoltaics:} PV panels convert sunlight to electricity with typical efficiencies of 18-22\%. Performance depends on irradiance, temperature, and angle of incidence. Module temperature affects output through a negative temperature coefficient (typically -0.4\%/°C), connecting directly to heat transfer principles.
+
+\hint{Thermal-fluid connection: Solar panels get hot! Convective cooling, mounting design, and thermal management affect performance.}
+
+\textbf{Wind Turbines:} Wind power extraction follows the Betz limit (59.3\% theoretical maximum). Power output scales with the cube of wind speed: $P = \frac{1}{2} \rho A v^3 C_p$, where fluid mechanics principles govern turbine design and wake effects.
+
+\hint{Add a sentence about the turbine technology you analyzed—size, type, why appropriate for your location.}
+
+\textbf{Battery Storage:} Lithium-ion batteries store energy electrochemically but involve significant thermal management challenges. Heat generation during charge/discharge affects lifetime and safety. Round-trip efficiency (~90\%) reflects electrochemical and thermal losses.
+
+\textbf{Other Technologies of Interest:} \\
+\hint{Here you can add information about any systems that were explored in thinking about this project. What are the thermal fluid concepts that guide their design and implementation?}
+
+\subsection{Port Energy Systems: Thermal-Fluid Considerations}
+
+Port operations require both electrical power and thermal energy:
+\begin{itemize}
+    \item \textbf{Electrical loads:} Cranes, lighting, refrigerated containers ("reefers"), shore power for docked vessels
+    \item \textbf{Thermal loads:} Building HVAC, cargo heating/cooling, de-icing \hint{if applicable to your location}
+\end{itemize}
+
+\hint{Thermal-fluid engineering relevance: Combined heat and power (CHP) systems, heat pumps, thermal storage, and waste heat recovery all involve heat exchangers, fluid flow, and thermodynamic cycles you've studied.}
+
+\subsection{Optimization in Energy Systems}
+
+Energy system design involves tradeoffs: capital cost vs. operational cost, reliability vs. renewable penetration, oversizing for resilience vs. capacity factor utilization. Optimization algorithms help navigate these tradeoffs systematically.
+
+\hint{Look through the code and identify the optimization algorithm, provide a short explanation of it function. Feel free to enlist AI or reach out to Max for this portion if you are having issues}
+
+\subsection{What's Promising and What's Limited}
+
+\textbf{Promising aspects:}
+\begin{itemize}
+    \item Renewable costs have dropped 80-90\% over the past decade
+    \item Battery storage makes high renewable penetration feasible
+    \item Port infrastructure (large areas, proximity to wind resources) suits renewable deployment
+    \item Growing regulatory pressure and corporate sustainability commitments
+\end{itemize}
+
+\textbf{Limitations:}
+\begin{itemize}
+    \item Intermittency requires oversizing or backup systems
+    \item Battery costs still significant; degradation reduces lifetime value
+    \item Space constraints in urban ports
+    \item Utility interconnection and permitting can be slow
+    \item Uncertainty in future load growth and electricity prices
+\end{itemize}
+
+\hint{Background should be 1.5-2 pages. Take a moment to consider the aspects of your chosen location that make it unique or interesting for this analysis. Why is this work worth pursuing?}
+
+% ============================================================================
+% METHODOLOGY
+% ============================================================================
+\section{Methodology}
+
+\hint{What tools did you use? How did you use them? How might they apply to other problems?}
+
+\subsection{Tools and Workflow Overview}
+
+Our analysis followed this workflow:
+\begin{enumerate}
+    \item \textbf{Data collection:} Meteorological data (solar/wind) and load profiles for [Location]
+    \item \textbf{Resource assessment:} Python analysis of renewable generation potential
+    \item \textbf{System sizing optimization:} Minimize cost subject to reliability constraints
+    \item \textbf{Thermal modeling:} COMSOL analysis of [describe thermal component] \hint{if applicable}
+    \item \textbf{Performance evaluation:} Annual simulation with optimized system
+\end{enumerate}
+\subsection{Python: Data Analysis and Modeling}
+
+We used Python with pandas, numpy, and matplotlib for:
+\begin{itemize}
+    \item Processing hourly weather data (8,760 hours/year)
+    \item Calculating PV generation using irradiance and temperature
+    \item Modeling wind turbine output from power curves
+    \item Visualizing load profiles and generation patterns
+\end{itemize}
+
+\hint{Why Python matters: These data manipulation and analysis skills transfer directly to ANY engineering role involving data—test data analysis, simulation results, field measurements, financial modeling, etc.}
+
+\subsection{COMSOL Thermal Modeling}
+
+\hint{If you used COMSOL for any thermal component—heat exchanger, thermal storage, building heating—describe it here. If not, delete this section.}
+
+We developed a COMSOL model to analyze [thermal component, e.g., heat exchanger for waste heat recovery, thermal storage tank, heat pump system].
+
+\textbf{Governing equations:} \hint{Energy balance, heat conduction, convection—whatever is relevant}
+
+\textbf{Key findings:} \hint{What did the thermal model tell you? Did it affect your system design?}
+
+\subsection{Assumptions and Limitations}
+
+\hint{CRITICAL: Document your assumptions! This shows engineering judgment.}
+
+\textbf{Key assumptions:}
+\begin{itemize}
+    \item Weather data from [source] represents typical conditions
+    \item Load profile based on [actual data / scaled from similar facility / synthetic]
+    \item Component costs from [NREL ATB / vendor quotes / literature]
+    \item Other significant assumptions specific to your analysis
+\end{itemize}
+
+\textbf{What we simplified:}
+\begin{itemize}
+    \item Perfect forecasting (real systems need prediction algorithms)
+    \item Neglected grid constraints / power quality issues
+    \item Assumed constant component efficiency (varies with load, temperature, etc.)
+\end{itemize}
+
+\hint{Being honest about limitations doesn't weaken your work—it strengthens it by showing you understand what you did and didn't model.}
+
+\subsection{Applicability to Other Contexts}
+
+\hint{One paragraph: Where else could you use these tools and this approach?}
+
+This methodology applies to any facility requiring reliable power: hospitals (backup critical), data centers (24/7 high loads), manufacturing (cost-sensitive), remote communities (off-grid), or military bases (energy security). The tools—Python for analysis, optimization for design, thermal modeling for heat integration—are fundamental to energy consulting, utilities, building design, and corporate sustainability roles.
+
+\hint{Methodology: aim for 2-2.5 pages total.}
+
+% ============================================================================
+% RESULTS
+% ============================================================================
+\section{Results}
+
+\hint{Let your figures do the talking! Each figure should have a descriptive caption that explains what's shown AND what it means. Brief text between figures provides narrative.}
+
+\subsection{Optimal System Configuration}
+
+The optimization resulted in the following system sizing for [Location]:
+
+\begin{table}[h]
+\centering
+\caption{Optimal renewable energy system design}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Component} & \textbf{Capacity} & \textbf{Annual Output} \\
+\midrule
+Solar PV & X kW & Y MWh \\
+Wind Turbines & Z kW (n units) & W MWh \\
+Battery Storage & A kWh / B kW & - \\
+Backup/Grid & C kW & D MWh \\
+\midrule
+\textbf{Renewable Fraction} & \textbf{E\%} & - \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\hint{Replace with your actual results. Add 1-2 sentences interpreting the sizing—does it make intuitive sense given your location's resources?}
+
+\subsection{Key Results: 8 Essential Figures}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.3\textwidth]{fig.png}
+    \caption{\textbf{TITLE.} caption text.}
+    \label{fig:1}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{fig.png}
+    \hfill
+    \includegraphics[width=0.45\textwidth]{fig.png}
+    \caption{Two figures side by side}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{fig.png}
+    \caption{\textbf{TITLE.} caption text.}
+    \label{fig:4}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{fig.png}
+    \caption{\textbf{TITLE.} caption text.}
+    \label{fig:5}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.2\textwidth]{fig.png}
+    \caption{\textbf{TITLE.} caption text.}
+    \label{fig:6}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\textwidth]{fig.png}
+        \caption{First subfigure}
+        \label{fig:sub1}
+    \end{subfigure}
+    \hfill  % Space between figures
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\textwidth]{fig.png}
+        \caption{Second subfigure}
+        \label{fig:sub2}
+    \end{subfigure}
+    \caption{Overall caption for both}
+    \label{fig:both}
+\end{figure}
+
+\hint{Figure captions are LONG and INFORMATIVE—they should tell the story even if someone only looks at figures. Each caption: (1) describes what's shown, (2) points out key patterns, (3) interprets what it means.}
+\clearpage
+% ============================================================================
+% DISCUSSION
+% ============================================================================
+\section{Discussion}
+
+\hint{This is YOUR reflection. What did you learn? What surprised you? How does this connect to bigger challenges? What would you do differently?}
+
+\subsection{Key Insights from the Analysis}
+
+\textbf{What surprised us:} \hint{Fill in something that genuinely surprised you from the results. Did solar dominate more than expected? Was battery sizing counterintuitive? Did costs work out better/worse than you thought?}
+
+\textbf{When the optimization "disagrees" with intuition:} The optimization recommended [X], but considering [practical factor not in the model], we might actually [alternative recommendation]. This highlights the difference between mathematical optimization and engineering judgment—both are necessary.
+
+\hint{Example: "Optimization says build 5 MW of wind, but that's 2 giant turbines in a small urban port. In reality, we'd probably use more distributed solar even if slightly less optimal."}
+
+\subsection{Connection to Complex Modern Challenges}
+
+This project illustrates several themes critical to addressing climate change through engineering:
+
+\textbf{Systems thinking:} Renewable energy isn't just about technology—it's about economics, reliability, stakeholder needs, and implementation constraints. No single metric (cost, emissions, efficiency) tells the whole story.
+
+\textbf{Tradeoffs are inevitable:} We cannot simultaneously minimize cost, maximize reliability, achieve 100\% renewables, and eliminate all environmental impact. Engineering is about navigating tradeoffs transparently.
+
+\textbf{Tools enable analysis, not decisions:} Python and optimization algorithms processed 8,760 hours of data and evaluated thousands of configurations—something impossible by hand. But the tools don't tell us what reliability target is "enough" or how to value carbon emissions. Those require human judgment.
+
+\hint{Add a paragraph about how this connects to YOUR field of interest or career goals. How might you use these skills in [automotive, aerospace, consulting, policy, etc.]?}
+
+\subsection{Simplifying Assumptions: Impact and Justification}
+
+Our analysis made several simplifying assumptions that affect results:
+
+\textbf{Perfect forecasting:} We assumed perfect knowledge of weather and load. Real systems need forecasting algorithms (machine learning!), and forecast errors require additional reserves.
+
+\textbf{Constant efficiency:} Component efficiency varies with load, temperature, and age. Batteries degrade, solar panels soil, wind turbines need maintenance. We used average values.
+
+\textbf{Grid always available:} We assumed grid import as backup. True islanded operation would require more redundancy.
+
+\hint{Add 2-3 more assumptions you made and how they affect interpretation.}
+
+\textbf{Why these assumptions are reasonable:} For preliminary sizing and concept viability, these simplifications allow tractable analysis without obscuring key trends. Detailed design would refine with higher fidelity models.
+
+\subsection{What We'd Do Differently / Future Improvements}
+
+\hint{Honest reflection: What would you change? Not because you did it "wrong" but because you learned something.}
+
+If starting over or extending this work:
+\begin{itemize}
+    \item Improvement 1—e.g., "Include demand response or flexible loads"
+    \item Improvement 2—e.g., "Model different battery chemistries more carefully"    \item Improvement 3—e.g., "Validate load profiles against actual port data"
+    \item Beyond scope: "Optimize for resilience to extreme events, not just cost"
+\end{itemize}
+
+\hint{Discussion should be 1.5-2 pages. Make it thoughtful and personal—this is where your voice comes through.}
+
+% ============================================================================
+% CONCLUSION
+% ============================================================================
+\section{Conclusion}
+
+\hint{Wrap it up: What did you accomplish? What's the outcome? How does this benefit your location?}
+
+This project designed an optimized renewable energy system for [Location], demonstrating that [X MW solar, Y MW wind, Z MWh storage] can achieve [renewable fraction] while [meeting/approaching] economic viability. The system reduces annual carbon emissions by [amount], equivalent to [meaningful comparison].
+
+\textbf{Key outcomes:}
+\begin{itemize}
+    \item Technical feasibility confirmed: renewable resources adequate for [reliability level]
+    \item Economic assessment: lifecycle costs [competitive with / X\% higher than] grid baseline
+    \item Environmental impact: [emissions reduction percentage]
+    \item Transferable methodology applicable to similar infrastructure
+\end{itemize}
+
+\textbf{Benefits to [Your Location]:}
+\begin{itemize}
+    \item Reduced local air pollution (NOx, particulates) benefiting [community]
+    \item Energy cost stability (hedging against fossil fuel price volatility)
+    \item Resilience through distributed generation and storage
+    \item Economic development through green technology deployment
+    \item Meeting regional/national decarbonization targets
+\end{itemize}
+
+\hint{Add 1-2 location-specific benefits based on what you learned about your port.}
+
+\textbf{Broader implications:} Ports represent just one node in global supply chains. Electrifying maritime logistics—from ships to ports to cargo transport—is essential to economy-wide decarbonization. This analysis provides a framework for systematic evaluation of renewable integration in critical infrastructure.
+
+\textbf{Final reflection:} \hint{One sentence that captures what this project taught you about engineering, problem-solving, or climate solutions. Make it memorable.}
+
+\hint{Conclusion: 1 page maximum. Leave them with a clear takeaway.}
+
+% ============================================================================
+% REFERENCES SECTION
+% ============================================================================
+
+% In-text citation example:
+% The methodology described in \cite{smith2022} demonstrates robust performance
+% across multiple datasets, with comparable results found in \cite{johnson2023}.
+
+\section*{References}
+
+
+\cite{chen2023,garcia2022,johnson2023,lee2021,smith2022}
+\printbibliography[heading=none]
+
+\section*{Appendix}
+Optional
+\end{document}
